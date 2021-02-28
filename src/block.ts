@@ -1,7 +1,8 @@
 import { Patterns } from './utils';
+import { MultiExtendError, MultiTerminateError } from './errors';
 const fs = require('fs');
 
-class Block {
+export class Block {
     type:string;
     name:string;
     content:string;
@@ -11,7 +12,7 @@ class Block {
         this.content = c;
     }
 }
-class ExtendInfo {
+export class ExtendInfo {
     isExtending:boolean;
     extendedFile:string;
     fileModifiedContent:string;
@@ -36,8 +37,7 @@ export class BlockController {
         var extendDirectives = fileContent.match(Patterns.extendRegex);
     
         if(extendDirectives.length > 1) {
-            extendingInfo.errors.push("hi");
-            return extendingInfo;
+            throw new MultiExtendError();            
         }
     
         extendingInfo.isExtending = true;
@@ -50,7 +50,6 @@ export class BlockController {
         var info = this.getExtendingInfo(fileContent);
         fileContent = info.fileModifiedContent;
         var blockHeaders = fileContent.match(Patterns.blockHeaderRegex);
-        console.log(blockHeaders)
         var fileAsBlocks = fileContent.split(Patterns.blockHeaderRegex)
         .filter(x=>x)
         .map((blockContent, i) => {
@@ -61,13 +60,12 @@ export class BlockController {
                     blockContent
                 )];
             i--;
-            console.log(blockContent, i)
             var blockType = 'regular';
             blockType = blockHeaders[i].includes("prepend") ? "prepend" : blockType;
             blockType = blockHeaders[i].includes("append") ? "append" : blockType;
             var blocks = blockContent.split(Patterns.blockFooterRegex);
             if(blocks.length !== 2) {
-                //throw somekind of error;
+                throw new MultiTerminateError();
             }
             return [
                 new Block(
