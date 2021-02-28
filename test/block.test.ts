@@ -1,3 +1,4 @@
+import { Patterns } from './../src/utils';
 import { FileTwoLevelsBlocks, FileWithMultiBlock, FileWithOneBlock } from './examples/example-blocks';
 import { Block, ExtendInfo, BlockController } from '../src/block';
 import { FileExtendingExample, FileNotExtendingExample, FileMultiExtendingExample } from './examples/example-info';
@@ -73,6 +74,102 @@ describe("Blocks Controller", () => {
     })
     describe("Merging Blocks", () => { 
         //to be done
+    });
+
+});
+
+describe("Patterns Test", () => { 
+    describe("Extend Expression Pattern Test", () => {
+        test("Basic usage test ", () => {
+            var example = "/* @extends 'file' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Usage with double quotes", () => {
+            var example = "/* @extends \"file\" */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Usage without quotes", () => {
+            var example = "/* @extends file */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(false);
+        });
+        test("Usage with wrong spelling", () => {
+            var example = "/* @extend 'file' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(false);
+        });
+        test("Against file naming with hyphen", () => {
+            var example = "/* @extends 'file-file' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Against file naming with underscore", () => {
+            var example = "/* @extends 'file_file' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Against file naming not english", () => {
+            var example = "/* @extends 'عربي' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Against file naming nested paths", () => {
+            var example = "/* @extends 'folder/file.ext' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Against file naming nested paths more levels", () => {
+            var example = "/* @extends 'folder/folder/file.ext' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Against file naming nested paths relative ", () => {
+            var example = "/* @extends './folder/folder/file.ext' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Against file naming nested paths backwards ", () => {
+            var example = "/* @extends '../../folder/folder/file.ext' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(true);
+        });
+        test("Against file with no name", () => {
+            var example = "/* @extends '' */" ;
+            expect(Patterns.extendRegex.test(example)).toBe(false);
+        });
+    })
+    describe("Block Header Expression Pattern Test", () => {
+        test("Basic Usage", () => {
+            var example = "/* @block someblock */" ;
+            expect(Patterns.blockHeaderRegex.test(example)).toBe(true);
+        });
+        test("Naming with hyphen", () => {
+            var example = "/* @block some-block */" ;
+            expect(Patterns.blockHeaderRegex.test(example)).toBe(true);
+        });
+        test("Naming with underscore", () => {
+            var example = "/* @block some_block */" ;
+            expect(Patterns.blockHeaderRegex.test(example)).toBe(true);
+        });
+        test("Naming with another lang", () => {
+            var example = "/* @block عربي */" ;
+            expect(Patterns.blockHeaderRegex.test(example)).toBe(true);
+        });
+        test("Adding prepend block", () => {
+            var example = "/* @block prepend someblock */" ;
+            expect(Patterns.blockHeaderRegex.test(example)).toBe(true);
+        });
+        test("Adding append block", () => {
+            var example = "/* @block append someblock */" ;
+            expect(Patterns.blockHeaderRegex.test(example)).toBe(true);
+        });
+        test("Empty name", () => {
+            var example = "/* @block  */" ;
+            expect(Patterns.blockHeaderRegex.test(example)).toBe(false);
+        });
+    
+    });
+
+    describe("Terminate Block Expression Pattern Test", () => {
+        test("Basic Usage", () => {
+            var example = "/* @terminate block */" ;
+            expect(Patterns.blockFooterRegex.test(example)).toBe(true);
+        });
+        test("Wrong Spelling ", () => {
+            var example = "/* @terminat block */" ;
+            expect(Patterns.blockFooterRegex.test(example)).toBe(false);
+        });
     });
 
 });
