@@ -1,5 +1,5 @@
 import { BlockController } from './block';
-const loader = function (content) {
+const loader = function (content:string) :string {
     const blockLevels = BlockController.ConvertToBlocks(content);
     const contentModified = BlockController.mergeBlocks(blockLevels);
     return contentModified;

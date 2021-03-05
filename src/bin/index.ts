@@ -16,6 +16,6 @@ const argv = option({
         demand: true
     }
 }).argv;
-let fileContent = fs.readFileSync(argv.inputFile, {encoding:'utf8', flag:'r'});
-let fileContentAfterModification = loader(fileContent);
+const fileContent = fs.readFileSync(argv.inputFile, {encoding:'utf8', flag:'r'});
+const fileContentAfterModification = loader(fileContent);
 fs.writeFileSync(argv.outputFile, fileContentAfterModification); 
