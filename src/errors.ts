@@ -1,12 +1,12 @@
 
 export class MultiExtendError extends Error {
-    constructor(message?: string) {
+    constructor() {
         super("Can't Extend Multiple Files");
     }
 }
 
 export class MultiTerminateError extends Error {
-    constructor(message?: string) {
+    constructor() {
         super("Multiple Terminate Expressions Detected");
     }
 }

@@ -1,15 +1,19 @@
 
-const path = require('path');
-const fs = jest.createMockFromModule('fs') as any;
+interface fsMock {
+  __setFileContent: (string) => void;
+  readFileSync: (string) => string;
+  
+}
+const fs:fsMock = jest.createMockFromModule('fs');
 
 
-var fileContent:string = '';
+let fileContent = '';
 
 function __setFileContent(content:string):void {
     fileContent = content;
 }
 
-function readFileSync(directoryPath):string {
+function readFileSync():string {
   return fileContent
 }
 
