@@ -27,7 +27,7 @@ export class ExtendInfo {
 }
 
 export class BlockController {
-    static getExtendingInfo(fileContent:string){
+    static getExtendingInfo(fileContent:string): ExtendInfo{
         const extendingInfo = new ExtendInfo();
     
         if(!Patterns.extendRegex.test(fileContent)) {
@@ -96,7 +96,7 @@ export class BlockController {
         return blocksLevels;
     }
 
-    static mergeBlocks(blocksLevels:Block[][]) {
+    static mergeBlocks(blocksLevels:Block[][]): string {
         const superBlock = blocksLevels.pop();
         const newFileContent = superBlock.reduce((prev, current) => {
             const findLastBlockByNameAndType = (name, type, fallback?) => {
