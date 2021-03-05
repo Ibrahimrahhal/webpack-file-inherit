@@ -1,9 +1,9 @@
 
-const path = require('path');
+import * as path from 'path';
 const fs = jest.createMockFromModule('fs') as any;
 
 
-var fileContent:string = '';
+let fileContent = '';
 
 function __setFileContent(content:string):void {
     fileContent = content;
