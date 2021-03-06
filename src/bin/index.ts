@@ -2,7 +2,7 @@ import { option } from 'yargs';
 import * as fs from 'fs';
 import loader from '../index';
 
-const argv = option({
+const { inputFile, outputFile } = option({
     inputFile: {
         describe: "Name of input file",
         alias: "file",
@@ -16,6 +16,6 @@ const argv = option({
         demand: true
     }
 }).argv;
-const fileContent = fs.readFileSync(argv.inputFile, {encoding:'utf8', flag:'r'});
+const fileContent = fs.readFileSync(inputFile, { encoding: 'utf8', flag: 'r' });
 const fileContentAfterModification = loader(fileContent);
-fs.writeFileSync(argv.outputFile, fileContentAfterModification); 
+fs.writeFileSync(outputFile, fileContentAfterModification); 
