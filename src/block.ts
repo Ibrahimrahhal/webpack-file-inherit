@@ -52,45 +52,45 @@ export class BlockController {
         fileContent = info.fileModifiedContent;
         const blockHeaders = fileContent.match(Patterns.blockHeaderRegex);
         const fileAsBlocks = fileContent.split(Patterns.blockHeaderRegex)
-        .filter(x=>x)
-        .map((blockContent, i) => {
-            if(i === 0)
-                return [new Block(
-                    "none",
-                    "none",
-                    blockContent
-                )];
-            i--;
-            let blockType = 'regular';
-            blockType = blockHeaders[i].includes("prepend") ? "prepend" : blockType;
-            blockType = blockHeaders[i].includes("append") ? "append" : blockType;
-            const blocks = blockContent.split(Patterns.blockFooterRegex);
-            if(blocks.length !== 2) {
-                throw new MultiTerminateError();
-            }
-            return [
-                new Block(
-                    blockType, 
-                    blockHeaders[i]
-                    .replace(Patterns.blockHeaderNameExtractRegex, "")
-                    .replace(/ */g,""), 
-                    blocks[0]
-                ),
-                new Block(
-                    "none",
-                    "none",
-                    blocks[1]
-                )
-            ];
-        })
-        .reduce((prev, current) => {
-            if(current instanceof Array)
-                return [...prev, ...current];
-            return [...prev, current];
-        }, []);
+            .filter(x=>x)
+            .map((blockContent, i) => {
+                if(i === 0)
+                    return [new Block(
+                        "none",
+                        "none",
+                        blockContent
+                    )];
+                i--;
+                let blockType = 'regular';
+                blockType = blockHeaders[i].includes("prepend") ? "prepend" : blockType;
+                blockType = blockHeaders[i].includes("append") ? "append" : blockType;
+                const blocks = blockContent.split(Patterns.blockFooterRegex);
+                if(blocks.length !== 2) {
+                    throw new MultiTerminateError();
+                }
+                return [
+                    new Block(
+                        blockType, 
+                        blockHeaders[i]
+                            .replace(Patterns.blockHeaderNameExtractRegex, "")
+                            .replace(/ */g,""), 
+                        blocks[0]
+                    ),
+                    new Block(
+                        "none",
+                        "none",
+                        blocks[1]
+                    )
+                ];
+            })
+            .reduce((prev, current) => {
+                if(current instanceof Array)
+                    return [...prev, ...current];
+                return [...prev, current];
+            }, []);
         let blocksLevels = [fileAsBlocks];
         if(info.isExtending) {
-            const extendedFileContent = fs.readFileSync(info.extendedFile, {encoding:'utf8', flag:'r'});
+            const extendedFileContent = fs.readFileSync(info.extendedFile, { encoding: 'utf8', flag: 'r' });
             blocksLevels = [...blocksLevels, ...this.ConvertToBlocks(extendedFileContent)];
         } 
         return blocksLevels;
@@ -116,7 +116,7 @@ export class BlockController {
                 return lastAccurOfBlock || fallback || '';
             }
             let fileContentUpTillNow = '';
-            fileContentUpTillNow += (prev || '')
+            fileContentUpTillNow += prev || '';
             if(current.type === "none") {
                 return fileContentUpTillNow + current.content;
             } else {
