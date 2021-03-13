@@ -1,6 +1,7 @@
 import { Patterns } from './utils';
 import { MultiExtendError, MultiTerminateError } from './errors';
-const fs = require('fs');
+import * as fs from 'fs';
+
 
 export class Block {
     type:string;
@@ -26,15 +27,15 @@ export class ExtendInfo {
 }
 
 export class BlockController {
-    static getExtendingInfo(fileContent:string){
-        var extendingInfo = new ExtendInfo();
+    static getExtendingInfo(fileContent:string): ExtendInfo{
+        const extendingInfo = new ExtendInfo();
     
         if(!Patterns.extendRegex.test(fileContent)) {
             extendingInfo.isExtending = false;
             extendingInfo.fileModifiedContent = fileContent;
             return extendingInfo;
         }
-        var extendDirectives = fileContent.match(Patterns.extendRegex);
+        const extendDirectives = fileContent.match(Patterns.extendRegex);
     
         if(extendDirectives.length > 1) {
             throw new MultiExtendError();            
@@ -47,59 +48,59 @@ export class BlockController {
     }
 
     static ConvertToBlocks(fileContent:string):Block[][] {
-        var info = this.getExtendingInfo(fileContent);
+        const info = this.getExtendingInfo(fileContent);
         fileContent = info.fileModifiedContent;
-        var blockHeaders = fileContent.match(Patterns.blockHeaderRegex);
-        var fileAsBlocks = fileContent.split(Patterns.blockHeaderRegex)
-        .filter(x=>x)
-        .map((blockContent, i) => {
-            if(i === 0)
-                return [new Block(
-                    "none",
-                    "none",
-                    blockContent
-                )];
-            i--;
-            var blockType = 'regular';
-            blockType = blockHeaders[i].includes("prepend") ? "prepend" : blockType;
-            blockType = blockHeaders[i].includes("append") ? "append" : blockType;
-            var blocks = blockContent.split(Patterns.blockFooterRegex);
-            if(blocks.length !== 2) {
-                throw new MultiTerminateError();
-            }
-            return [
-                new Block(
-                    blockType, 
-                    blockHeaders[i]
-                    .replace(Patterns.blockHeaderNameExtractRegex, "")
-                    .replace(/ */g,""), 
-                    blocks[0]
-                ),
-                new Block(
-                    "none",
-                    "none",
-                    blocks[1]
-                )
-            ];
-        })
-        .reduce((prev, current) => {
-            if(current instanceof Array)
-                return [...prev, ...current];
-            return [...prev, current];
-        }, []);
-        var blocksLevels = [fileAsBlocks];
+        const blockHeaders = fileContent.match(Patterns.blockHeaderRegex);
+        const fileAsBlocks = fileContent.split(Patterns.blockHeaderRegex)
+            .filter(x=>x)
+            .map((blockContent, i) => {
+                if(i === 0)
+                    return [new Block(
+                        "none",
+                        "none",
+                        blockContent
+                    )];
+                i--;
+                let blockType = 'regular';
+                blockType = blockHeaders[i].includes("prepend") ? "prepend" : blockType;
+                blockType = blockHeaders[i].includes("append") ? "append" : blockType;
+                const blocks = blockContent.split(Patterns.blockFooterRegex);
+                if(blocks.length !== 2) {
+                    throw new MultiTerminateError();
+                }
+                return [
+                    new Block(
+                        blockType, 
+                        blockHeaders[i]
+                            .replace(Patterns.blockHeaderNameExtractRegex, "")
+                            .replace(/ */g,""), 
+                        blocks[0]
+                    ),
+                    new Block(
+                        "none",
+                        "none",
+                        blocks[1]
+                    )
+                ];
+            })
+            .reduce((prev, current) => {
+                if(current instanceof Array)
+                    return [...prev, ...current];
+                return [...prev, current];
+            }, []);
+        let blocksLevels = [fileAsBlocks];
         if(info.isExtending) {
-            var extendedFileContent = fs.readFileSync(info.extendedFile, {encoding:'utf8', flag:'r'});
+            const extendedFileContent = fs.readFileSync(info.extendedFile, { encoding: 'utf8', flag: 'r' });
             blocksLevels = [...blocksLevels, ...this.ConvertToBlocks(extendedFileContent)];
         } 
         return blocksLevels;
     }
 
-    static mergeBlocks(blocksLevels:Block[][]) {
-        var superBlock = blocksLevels.pop();
-        var newFileContent = superBlock.reduce((prev, current) => {
-            var findLastBlockByNameAndType = (name, type, fallback?) => {
-                var lastAccurOfBlock:Block;
+    static mergeBlocks(blocksLevels:Block[][]): string {
+        const superBlock = blocksLevels.pop();
+        const newFileContent = superBlock.reduce((prev, current) => {
+            const findLastBlockByNameAndType = (name, type, fallback?) => {
+                let lastAccurOfBlock:Block;
                 blocksLevels.reverse();
                 blocksLevels.forEach((level) => {
                     level.forEach((block) => {
@@ -114,8 +115,8 @@ export class BlockController {
                 });
                 return lastAccurOfBlock || fallback || '';
             }
-            var fileContentUpTillNow = '';
-            fileContentUpTillNow += (prev || '')
+            let fileContentUpTillNow = '';
+            fileContentUpTillNow += prev || '';
             if(current.type === "none") {
                 return fileContentUpTillNow + current.content;
             } else {

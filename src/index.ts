@@ -1,6 +1,8 @@
 import { BlockController } from './block';
-module.exports = function loader(content) {
-    let blockLevels = BlockController.ConvertToBlocks(content);
-    let contentModified = BlockController.mergeBlocks(blockLevels);
+const loader = function (content:string) :string {
+    const blockLevels = BlockController.ConvertToBlocks(content);
+    const contentModified = BlockController.mergeBlocks(blockLevels);
     return contentModified;
 }
+export default loader;
+module.exports = loader;
