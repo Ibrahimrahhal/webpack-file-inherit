@@ -1,6 +1,6 @@
 {
   "name": "webpack-file-inherit",
-  "version": "1.0.0-alpha.10",
+  "version": "1.0.0-alpha.11",
   "description": "Webpack loader that enables pug like inheritance for any file type",
   "main": "dist/src/index.js",
   "scripts": {
@@ -41,10 +41,11 @@
     "webpack-cli": "^4.5.0"
   },
   "files": [
-    "dist/*"
+    "dist/src/*"
   ],
   "dependencies": {
-    "yargs": "^16.2.0"
+    "yargs": "^16.2.0",
+    "chalk": "^4.1.0"
   },
   "bin": "dist/src/bin/index.js"
 }
