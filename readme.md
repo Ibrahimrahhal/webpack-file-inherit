@@ -42,7 +42,7 @@ This loader enables you to exends files is a simlier way that pug templting engi
 var x = 16;
 /* @block secondValue */
 var y = 15;
-/* @terminal block */
+/* @terminate block */
 console.log(x*y);
 ```
 **Child.js**
@@ -50,7 +50,7 @@ console.log(x*y);
 /* @extends "./Parent.js" */
 /* @block secondValue */
 var y = 0;
-/* @terminal block */
+/* @terminate block */
 ```
 bunding the Child.js will result this file
 ```js

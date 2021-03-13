@@ -73,6 +73,9 @@ export default class FileController {
         if(last) {
             lines.reverse();
         }
+        if(lines.length === 0) {
+            return headerFormatter ? headerFormatter(this) : '';
+        }
         const [line] = lines;
         const block = this._content.getBlockAroundLine(line.numbering, 5);
         const formratedString = block.reduce((prev, curr) => {
