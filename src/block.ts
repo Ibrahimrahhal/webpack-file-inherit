@@ -1,6 +1,6 @@
 import { Patterns } from './utils';
-import { MultiExtendError, MultiTerminateError } from './errors';
-import * as fs from 'fs';
+import { MultiExtendError, MultiTerminateError, throwDescriptiveError } from './errors';
+import FileController from './file';
 
 
 export class Block {
@@ -27,9 +27,10 @@ export class ExtendInfo {
 }
 
 export class BlockController {
-    static getExtendingInfo(fileContent:string): ExtendInfo{
+
+    static getExtendingInfo(file: FileController): ExtendInfo {
         const extendingInfo = new ExtendInfo();
-    
+        const fileContent = file.content;
         if(!Patterns.extendRegex.test(fileContent)) {
             extendingInfo.isExtending = false;
             extendingInfo.fileModifiedContent = fileContent;
@@ -38,7 +39,7 @@ export class BlockController {
         const extendDirectives = fileContent.match(Patterns.extendRegex);
     
         if(extendDirectives.length > 1) {
-            throw new MultiExtendError();            
+            throwDescriptiveError(MultiExtendError, file, extendDirectives.reverse()[0]);
         }
     
         extendingInfo.isExtending = true;
@@ -47,9 +48,9 @@ export class BlockController {
         return extendingInfo;
     }
 
-    static ConvertToBlocks(fileContent:string):Block[][] {
-        const info = this.getExtendingInfo(fileContent);
-        fileContent = info.fileModifiedContent;
+    static ConvertToBlocks(file:FileController):Block[][] {
+        const info = this.getExtendingInfo(file);
+        const fileContent = info.fileModifiedContent;
         const blockHeaders = fileContent.match(Patterns.blockHeaderRegex);
         const fileAsBlocks = fileContent.split(Patterns.blockHeaderRegex)
             .filter(x=>x)
@@ -66,7 +67,7 @@ export class BlockController {
                 blockType = blockHeaders[i].includes("append") ? "append" : blockType;
                 const blocks = blockContent.split(Patterns.blockFooterRegex);
                 if(blocks.length !== 2) {
-                    throw new MultiTerminateError();
+                    throwDescriptiveError(MultiTerminateError, file, blocks.reverse()[0]);
                 }
                 return [
                     new Block(
@@ -90,8 +91,8 @@ export class BlockController {
             }, []);
         let blocksLevels = [fileAsBlocks];
         if(info.isExtending) {
-            const extendedFileContent = fs.readFileSync(info.extendedFile, { encoding: 'utf8', flag: 'r' });
-            blocksLevels = [...blocksLevels, ...this.ConvertToBlocks(extendedFileContent)];
+            const extendedFile = new FileController(info.extendedFile);
+            blocksLevels = [...blocksLevels, ...this.ConvertToBlocks(extendedFile)];
         } 
         return blocksLevels;
     }
