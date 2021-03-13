@@ -37,11 +37,11 @@ class Lines extends Array<Line> {
             throw new Error("Invalid Line Number");
         }
         blockSize = Math.ceil(blockSize / 2);
-        let startPoint = lineNumber - blockSize;
-        let endPoint = lineNumber + blockSize;
-        let block = new Lines();
+        const startPoint = lineNumber - blockSize;
+        const endPoint = lineNumber + blockSize;
+        const block = new Lines();
         for(let i = startPoint; i <= endPoint; i++) {
-            let line = this.findLine(i) || new Line(undefined, "");
+            const line = this.findLine(i) || new Line(undefined, "");
             if(line) {
                 block.push(line);
             }
@@ -58,23 +58,23 @@ export default class FileController {
     constructor(path:string, content?:string) {
         this._path = path;
         let fileContent = content;
-        if(!content) fileContent =  fs.readFileSync(this._path, { encoding:'utf8', flag:'r' });
+        if(!content) fileContent =  fs.readFileSync(this._path, { encoding: 'utf8', flag: 'r' });
         this._content = new Lines(fileContent.split("\n").map((line, index) => new Line(index+1, line)));
     }
     get content(): string {
         return this._content.getContent();
     }
 
-    formattedLineVisual(lineContent, last = true, disableColor = false): string {
-        let lines = this._content.findLines(lineContent);
+    formattedLineVisual(lineContent:string , last = true, disableColor = false): string {
+        const lines = this._content.findLines(lineContent);
         if(last) {
             lines.reverse();
         }
-        let line = lines[0];
-        let block = this._content.getBlockAroundLine(line.numbering, 5);
-        let formratedString = block.reduce((prev, curr) => {
-            let isSelectedLine = curr.numbering === line.numbering;
-            let formatted = `${prev}${isSelectedLine ? '> ' : '  '} ${curr.numbering ? curr.numbering + ')' : ' '} ${curr.content}\n`;
+        const [line] = lines;
+        const block = this._content.getBlockAroundLine(line.numbering, 5);
+        const formratedString = block.reduce((prev, curr) => {
+            const isSelectedLine = curr.numbering === line.numbering;
+            const formatted = `${prev}${isSelectedLine ? '> ' : '  '} ${curr.numbering ? `${curr.numbering  })` : ' '} ${curr.content}\n`;
             return  isSelectedLine ? !disableColor ? chalk.red(formatted) : formatted : !disableColor ? chalk.white(formatted) : formatted;
         }, '\n');
         return formratedString;
