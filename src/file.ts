@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as chalk from 'chalk';
+
 class Line {
     numbering:number;
     content:string;
@@ -8,15 +11,17 @@ class Line {
 }
 
 class Lines extends Array<Line> {
+    
     constructor(lines?: Line[]) {
         super();
-        if(lines) {
+        if(lines && lines instanceof Array) {
             lines.forEach(line => this.push(line));
         }
+        Object.setPrototypeOf(this, Object.create(Lines.prototype));
     }
 
     getContent(): string {
-        return this.reduce((prev, curr) => `${prev}\n${curr}`, "") as string;
+        return this.map(line => line.content).join("\n");
     }
     findLines(lineContent:string): Lines {
         return new Lines(this.filter(line => line.content.includes(lineContent)));
@@ -31,11 +36,12 @@ class Lines extends Array<Line> {
         if(lineNumber < 1) {
             throw new Error("Invalid Line Number");
         }
+        blockSize = Math.ceil(blockSize / 2);
         let startPoint = lineNumber - blockSize;
         let endPoint = lineNumber + blockSize;
         let block = new Lines();
         for(let i = startPoint; i <= endPoint; i++) {
-            let line = this.findLine(startPoint);
+            let line = this.findLine(i) || new Line(undefined, "");
             if(line) {
                 block.push(line);
             }
@@ -51,16 +57,15 @@ export default class FileController {
     private _content:Lines;
     constructor(path:string, content?:string) {
         this._path = path;
-        if(!content) {
-            let fileContent =  fs.readFileSync(this._path, {encoding:'utf8', flag:'r'});
-            this._content = new Lines(fileContent.split("\n").map((line, index) => new Line(index+1, line)));
-        }
+        let fileContent = content;
+        if(!content) fileContent =  fs.readFileSync(this._path, { encoding:'utf8', flag:'r' });
+        this._content = new Lines(fileContent.split("\n").map((line, index) => new Line(index+1, line)));
     }
     get content(): string {
         return this._content.getContent();
     }
 
-    formattedLineVisual(lineContent, last = true): string {
+    formattedLineVisual(lineContent, last = true, disableColor = false): string {
         let lines = this._content.findLines(lineContent);
         if(last) {
             lines.reverse();
@@ -69,8 +74,9 @@ export default class FileController {
         let block = this._content.getBlockAroundLine(line.numbering, 5);
         let formratedString = block.reduce((prev, curr) => {
             let isSelectedLine = curr.numbering === line.numbering;
-            return `${isSelectedLine ? '> ' : '  '} ${curr.numbering}) ${curr.content}\n`;
-        }, '');
+            let formatted = `${prev}${isSelectedLine ? '> ' : '  '} ${curr.numbering ? curr.numbering + ')' : ' '} ${curr.content}\n`;
+            return  isSelectedLine ? !disableColor ? chalk.red(formatted) : formatted : !disableColor ? chalk.white(formatted) : formatted;
+        }, '\n');
         return formratedString;
     }
 }
