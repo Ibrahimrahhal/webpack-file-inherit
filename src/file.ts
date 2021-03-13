@@ -80,6 +80,6 @@ export default class FileController {
             const formatted = `${prev}${isSelectedLine ? '> ' : '  '} ${curr.numbering ? `${curr.numbering  })` : ' '} ${curr.content}\n`;
             return  isSelectedLine ? !disableColor ? chalk.red(formatted) : formatted : !disableColor ? chalk.white(formatted) : formatted;
         }, '\n');
-        return formratedString;
+        return `${headerFormatter ? headerFormatter(this) : ''}${formratedString}`;
     }
 }
