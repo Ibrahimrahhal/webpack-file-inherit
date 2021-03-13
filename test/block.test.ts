@@ -38,7 +38,7 @@ describe("Blocks Controller", () => {
             expect(info.isExtending).toBe(true);
             expect(info.errors).toHaveLength(0);
             expect(info.fileModifiedContent).toBe(FileExtendingExample.after);
-            expect(info.extendedFile).toBe(FileExtendingExample.extending);
+            expect(info.extendedFile).toBe('.' + FileExtendingExample.extending);
         });
         test("not extending", () => {
             const info = BlockController.getExtendingInfo({ content: FileNotExtendingExample.content } as FileController);

@@ -46,7 +46,7 @@ export class BlockController {
         extendingInfo.fileModifiedContent = fileContent.replace(Patterns.extendRegex, "");
         extendingInfo.extendedFile = extendDirectives[0].replace(/@extends +/g, "").replace(/('|"| )/g, "");
         if(!path.isAbsolute(extendingInfo.extendedFile)) {
-            extendingInfo.extendedFile = path.join(file.path, '../', extendingInfo.extendedFile);
+            extendingInfo.extendedFile = path.join(file.path || '', '../', extendingInfo.extendedFile);
         }
         return extendingInfo;
     }
