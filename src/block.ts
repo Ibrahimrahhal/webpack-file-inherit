@@ -1,7 +1,7 @@
 import { Patterns } from './utils';
 import { MultiExtendError, MultiTerminateError, throwDescriptiveError } from './errors';
 import FileController from './file';
-
+import * as path from 'path';
 
 export class Block {
     type:string;
@@ -45,6 +45,9 @@ export class BlockController {
         extendingInfo.isExtending = true;
         extendingInfo.fileModifiedContent = fileContent.replace(Patterns.extendRegex, "");
         extendingInfo.extendedFile = extendDirectives[0].replace(/@extends +/g, "").replace(/('|"| )/g, "");
+        if(!path.isAbsolute(extendingInfo.extendedFile)) {
+            extendingInfo.extendedFile = path.join(file.path, '../', extendingInfo.extendedFile);
+        }
         return extendingInfo;
     }
 
