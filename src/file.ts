@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as chalk from 'chalk';
-
+import * as path from 'path';
 class Line {
     numbering:number;
     content:string;
@@ -64,8 +64,11 @@ export default class FileController {
     get content(): string {
         return this._content.getContent();
     }
+    get path(): string {
+        return path.resolve(this._path);
+    }
 
-    formattedLineVisual(lineContent:string , last = true, disableColor = false): string {
+    formattedLineVisual(lineContent:string, last = true, disableColor = false, headerFormatter?: (file:FileController) => string): string {
         const lines = this._content.findLines(lineContent);
         if(last) {
             lines.reverse();

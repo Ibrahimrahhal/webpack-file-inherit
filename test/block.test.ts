@@ -5,6 +5,8 @@ import { FileExtendingExample, FileNotExtendingExample, FileMultiExtendingExampl
 import './__mocks__/fs';
 jest.mock('fs');
 import * as fs from 'fs';
+import FileController from '../src/file';
+
 describe("Block Class", () => {
     test("Creation", () => {
         const type = "Type-X",
@@ -31,41 +33,42 @@ describe("File Info Class", () => {
 describe("Blocks Controller", () => {
     describe("GetExtendingInfo", () => { 
         test("extending", () => {
-            const info = BlockController.getExtendingInfo(FileExtendingExample.content);
+
+            const info = BlockController.getExtendingInfo( { content: FileExtendingExample.content } as FileController);
             expect(info.isExtending).toBe(true);
             expect(info.errors).toHaveLength(0);
             expect(info.fileModifiedContent).toBe(FileExtendingExample.after);
             expect(info.extendedFile).toBe(FileExtendingExample.extending);
         });
         test("not extending", () => {
-            const info = BlockController.getExtendingInfo(FileNotExtendingExample.content);
+            const info = BlockController.getExtendingInfo({ content: FileNotExtendingExample.content } as FileController);
             expect(info.isExtending).toBe(false);
             expect(info.errors).toHaveLength(0);
             expect(info.fileModifiedContent).toBe(FileNotExtendingExample.content);
             expect(info.extendedFile).toBe('');
         });
         test("extend multiple files", () => {
-            const extend = () => BlockController.getExtendingInfo(FileMultiExtendingExample.content);
+            const extend = () => BlockController.getExtendingInfo({ content: FileMultiExtendingExample.content } as FileController);
             expect(extend).toThrowError();
         });
     });
 
     describe("ConvertToBlocks", () => { 
         test("one level & one block", () => {
-            const blockLevels = BlockController.ConvertToBlocks(FileWithOneBlock);
+            const blockLevels = BlockController.ConvertToBlocks({ content: FileWithOneBlock } as FileController);
             expect(blockLevels).toHaveLength(1);
             expect(blockLevels[0]).toHaveLength(3);
             expect(blockLevels[0].filter(block => block.type==="none")).toHaveLength(2);
         });
         test("one level & multipe blocks", () => {
-            const blockLevels = BlockController.ConvertToBlocks(FileWithMultiBlock);
+            const blockLevels = BlockController.ConvertToBlocks({ content: FileWithMultiBlock } as FileController);
             expect(blockLevels).toHaveLength(1);
             expect(blockLevels[0]).toHaveLength(7);
             expect(blockLevels[0].filter(block => block.type==="none")).toHaveLength(4);
         });
         test("Two levels & multipe blocks", () => {
             (fs as any).__setFileContent(FileTwoLevelsBlocks.parent);
-            const blockLevels = BlockController.ConvertToBlocks(FileTwoLevelsBlocks.child);
+            const blockLevels = BlockController.ConvertToBlocks({ content: FileTwoLevelsBlocks.child } as FileController);
             expect(blockLevels).toHaveLength(2);
             expect(blockLevels[0]).toHaveLength(5);
             expect(blockLevels[0].filter(block => block.type==="none")).toHaveLength(3);
